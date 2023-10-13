@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -83,6 +85,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _counter = 0;
   int _maxWear = 30;
+  String _lastWorn = "";
 
   //Loading counter value on start
   Future<void> _loadCounter() async {
@@ -90,6 +93,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _counter = (prefs.getInt('counter') ?? 0);
       _maxWear = (prefs.getInt('maxWear') ?? 30);
+      _lastWorn = (prefs.getString('lastWorn') ?? "");
     });
   }
 
@@ -98,7 +102,9 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       if (_counter >= _maxWear) return;
       _counter = (prefs.getInt('counter') ?? 0) + 1;
+      _lastWorn = DateTime.now().toIso8601String();
       prefs.setInt('counter', _counter);
+      prefs.setString('lastWorn', _lastWorn);
     });
   }
 
@@ -193,6 +199,13 @@ class _HomePageState extends State<HomePage> {
                 style: Theme.of(context).textTheme.displaySmall,
               ),
             ),
+            Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: _lastWorn != ""
+                    ? Text(
+                        'Last Worn: ${DateTime.parse(_lastWorn).month}/${DateTime.parse(_lastWorn).day}/${DateTime.parse(_lastWorn).year}')
+                    : Text("blank")),
+            // 'Last Worn: ${DateTime.parse(_lastWorn).toString()}'))
           ],
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
